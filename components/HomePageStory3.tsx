@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePageStory1({}) {
   return (
@@ -13,12 +14,12 @@ export default function HomePageStory1({}) {
           Bailey braved a perilous solo journey through hostile wilderness to
           save the town. With grit, a rifle, and a horse, she defied all odds,
           returning as a hero.{" "}
-          <a
+          <Link
             href="/stories/bailey-saves-town"
             className="underline text-blue-800"
           >
             Read More
-          </a>
+          </Link>
           .
         </p>
       </div>
