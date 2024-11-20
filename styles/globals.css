@@ -3,19 +3,54 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #f4d3a8;
   --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.diplomata-sc-regular {
+  font-family: "Diplomata SC", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.girassol-regular {
+  font-family: "Girassol", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(black 1px, transparent 1px);
+  background-size: 2px 2px; /* Adjust for dot spacing */
+  opacity: 0.1; /* Adjust visibility of dots */
+}
+
+.cutout-div {
+  width: 100%; /* Adjust as needed */
+  height: 100%; /* Adjust as needed */
+  position: relative;
+  -webkit-mask: radial-gradient(circle 20px at top left, transparent 98%, black)
+      top left,
+    radial-gradient(circle 20px at top right, transparent 98%, black) top right,
+    radial-gradient(circle 20px at bottom right, transparent 98%, black) bottom
+      right,
+    radial-gradient(circle 20px at bottom left, transparent 98%, black) bottom
+      left;
+  -webkit-mask-size: 50% 50%;
+  -webkit-mask-repeat: no-repeat;
+  mask: radial-gradient(circle 20px at top left, transparent 98%, black) top
+      left,
+    radial-gradient(circle 20px at top right, transparent 98%, black) top right,
+    radial-gradient(circle 20px at bottom right, transparent 98%, black) bottom
+      right,
+    radial-gradient(circle 20px at bottom left, transparent 98%, black) bottom
+      left;
+  mask-size: 50% 50%;
+  mask-repeat: no-repeat;
 }
