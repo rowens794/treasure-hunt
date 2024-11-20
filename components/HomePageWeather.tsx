@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function HomeWeather({}) {
   return (
-    <div className="w-full py-4 rounded-sm ">
+    <div className="w-full pt-4 rounded-sm pb-12">
       <div className="flex gap-4">
         <Image
           src="/farmer.png"
