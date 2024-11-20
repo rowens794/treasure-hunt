@@ -15,7 +15,7 @@ export default function Document() {
           rel="stylesheet"
         ></link>
       </Head>
-      <body className="antialiased">
+      <body className="antialiased max-w-sm">
         <Main />
         <NextScript />
       </body>
