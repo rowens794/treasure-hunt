@@ -48,7 +48,7 @@ export default function Story() {
         <div className="w-full px-8">
           <h1 className="text-3xl font-bold mt-4 mb-2">{storyTitle}</h1>
           <p className="text-sm text-gray-600 mb-4">{storyDate}</p>
-          <div className="text-base leading-7 text-gray-900">
+          <div className="text-base leading-7 text-gray-900 text-justify">
             {storyParagraphs.map((paragraph, index) => (
               <p key={index} className="mb-4">
                 {paragraph}

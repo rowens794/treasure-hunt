@@ -29,15 +29,20 @@ export default function HomePageStory1({}) {
 
 const HeroImage = () => {
   return (
-    <div className="border border-stone-600 relative ml-4 mb-2">
-      <Image
-        src="/anne-bailey.png"
-        alt="hero"
-        width={400}
-        height={300}
-        className="grayscale blur-[0.5px] opacity-60 contrast-100"
-      />
-      <div className="absolute inset-0 bg-dot-pattern mix-blend-multiply pointer-events-none"></div>
+    <div className="">
+      <div className="border border-stone-600 relative ">
+        <Image
+          src="/anne-bailey.png"
+          alt="hero"
+          width={400}
+          height={300}
+          className="grayscale blur-[0.5px] opacity-60 contrast-100"
+        />
+        <div className="absolute inset-0 bg-dot-pattern mix-blend-multiply pointer-events-none"></div>
+      </div>
+      <div className="w-full text-right">
+        <span className="text-xs italic">Bailey&apos;s 50-mile Journey</span>
+      </div>
     </div>
   );
 };
