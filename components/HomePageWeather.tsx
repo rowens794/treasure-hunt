@@ -18,21 +18,12 @@ export default function HomeWeather({}) {
         </div>
       </div>
       <div className="flex justify-between border-stone-600 border-t-2 border-b-2 pt-2 pb-2">
-        <WeatherCube
-          time={["Morning", "AM"]}
-          temp={54}
-          condition={"rain-no-bg.png"}
-        />
+        <WeatherCube time={["Morning", "AM"]} condition={"rain-no-bg.png"} />
         <WeatherCube
           time={["Afternoon", "PM"]}
-          temp={68}
           condition={"sunny-valley.png"}
         />
-        <WeatherCube
-          time={["Evening", "PM"]}
-          temp={74}
-          condition={"night.png"}
-        />
+        <WeatherCube time={["Evening", "PM"]} condition={"night.png"} />
       </div>
     </div>
   );
@@ -40,11 +31,9 @@ export default function HomeWeather({}) {
 
 const WeatherCube = ({
   time,
-  temp,
   condition,
 }: {
   time: string[];
-  temp: number;
   condition: string;
 }) => {
   return (
