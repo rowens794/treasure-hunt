@@ -34,7 +34,7 @@ export default function Story() {
       <div className="relative w-full bg-parchment">
         <NewsTooper />
 
-        <div className="border border-stone-600 relative ml-4 mb-2 mx-2">
+        <div className="border border-stone-600 relative mb-2 mx-4">
           <Image
             src="/anne-bailey.png"
             alt="hero"

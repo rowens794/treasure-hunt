@@ -22,9 +22,7 @@ export default function NewsTooper() {
           <SvgFlourish />
         </div>
         <div className="flex flex-col justify-center">
-          <span className=" text-[.6rem] font-serif text-stone-700 w-full text-right mb-1">
-            5 cents
-          </span>
+          <span className=" text-[.6rem] font-serif text-stone-700 w-full text-right mb-1 h-[14.4px]"></span>
 
           <span className="text-2xl diplomata-sc-regular w-32 text-center border-t border-stone-800 border-b-4 border-double">
             Hunt
