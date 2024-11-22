@@ -1,7 +1,8 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import User from "../interfaces/User";
 import withAuth from "../lib/withAuth";
+import { supabase } from "../lib/supabaseClient";
 
 interface HomeProps {
   user: User;
@@ -10,10 +11,23 @@ interface HomeProps {
 const Menu: React.FC<HomeProps> = ({ user }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    // Clean up the class when the component unmounts
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [menuOpen]);
+
   return (
     <div className="z-[99] w-full fixed max-w-md top-2 flex justify-end">
       {!menuOpen && (
-        <button onClick={() => setMenuOpen(!menuOpen)} className="z-[100] ">
+        <button onClick={() => setMenuOpen(!menuOpen)} className="z-[100] mr-4">
           <svg
             viewBox="0 0 100 80"
             width="40"
@@ -79,10 +93,30 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
 };
 
 const MenuItem = ({ text, href }: { text: string; href: string }) => {
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.log("Error logging out:", error.message);
+    if (!error) window.location.href = "/";
+  };
+
   return (
-    <Link href={href} className="text-4xl text-stone-100 pb-2 cursor-pointer">
-      {text}
-    </Link>
+    <>
+      {text === "Logout" ? (
+        <button
+          onClick={handleLogout}
+          className="text-4xl text-stone-100 pb-2 cursor-pointer"
+        >
+          {text}
+        </button>
+      ) : (
+        <Link
+          href={href}
+          className="text-4xl text-stone-100 pb-2 cursor-pointer"
+        >
+          {text}
+        </Link>
+      )}
+    </>
   );
 };
 
