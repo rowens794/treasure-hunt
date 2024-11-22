@@ -1,11 +1,12 @@
 // pages/login.tsx
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
-import Navbar from "../components/Navbar";
+import Menu from "../components/Menu";
 import { FcGoogle } from "react-icons/fc"; // Google Icon
 import { FaFacebook } from "react-icons/fa"; // Facebook Icon
 import User from "../interfaces/User";
 import withAuth from "../lib/withAuth";
+import NewsTooper from "@/components/NewsTooper";
 
 interface Props {
   user: User;
@@ -54,20 +55,16 @@ function Login({ user }: Props) {
 
   return (
     <>
-      <Navbar user={user} />
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <NewsTooper />
+      <Menu user={user} />
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-8 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            alt="Your Company"
-            src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-            className="mx-auto h-10 w-auto"
-          />
           {user ? (
-            <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+            <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900 girassol-regular">
               You&apos;re already logged in!
             </h2>
           ) : (
-            <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+            <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900 girassol-regular">
               Sign in to your account
             </h2>
           )}
@@ -80,14 +77,14 @@ function Login({ user }: Props) {
               <div className="space-y-3">
                 <button
                   onClick={() => handleSocialLogin("google")}
-                  className="w-full flex items-center justify-center rounded-md bg-white border border-gray-300 px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+                  className="w-full flex items-center justify-center rounded-sm bg-[#FBEDDC] border border-stone-700 px-3 py-1.5 text-sm font-semibold font-serif text-stone-700 shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
                 >
                   <FcGoogle className="mr-2 h-5 w-5" />
                   Sign in with Google
                 </button>
                 <button
                   onClick={() => handleSocialLogin("facebook")}
-                  className="w-full flex items-center justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-700"
+                  className="w-full flex items-center justify-center rounded-sm bg-blue-600 font-serif px-3 py-1.5 text-sm font-semibold text-white shadow-sm border border-stone-700 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-700"
                 >
                   <FaFacebook className="mr-2 h-5 w-5" />
                   Sign in with Facebook
@@ -97,24 +94,27 @@ function Login({ user }: Props) {
               {/* Consistent Separation */}
               <div className="relative mt-12">
                 {/* Separation */}
-                <div className="border-t border-gray-300"></div>
+                <div className="border-t border-stone-800"></div>
 
                 {/* Explainer Text */}
-                <p className="absolute inset-x-0 -top-2 mx-auto w-max bg-white px-2 text-center text-sm text-gray-500">
+                <p className="absolute inset-x-0 -top-2 mx-auto w-max bg-[#f4d3a8] px-2 text-center text-sm text-stone-800 font-serif">
                   Or sign up with your email
                 </p>
               </div>
 
               {/* Email/Password Login Form */}
-              <form className="space-y-6 mt-6" onSubmit={handleEmailLogin}>
+              <form
+                className="space-y-6 mt-6 font-serif text-stone-900"
+                onSubmit={handleEmailLogin}
+              >
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-medium "
                   >
                     Email address
                   </label>
-                  <div className="mt-2">
+                  <div className="">
                     <input
                       id="email"
                       name="email"
@@ -123,7 +123,7 @@ function Login({ user }: Props) {
                       autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-4"
+                      className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm  ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
                     />
                   </div>
                 </div>
@@ -139,13 +139,13 @@ function Login({ user }: Props) {
                     <div className="text-sm">
                       <a
                         href="#"
-                        className="font-semibold text-indigo-600 hover:text-indigo-500"
+                        className="font-semibold text-[#304C89] hover:text-sky-800"
                       >
                         Forgot password?
                       </a>
                     </div>
                   </div>
-                  <div className="mt-2">
+                  <div className="">
                     <input
                       id="password"
                       name="password"
@@ -154,7 +154,7 @@ function Login({ user }: Props) {
                       autoComplete="current-password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-4"
+                      className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm  ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
                     />
                   </div>
                 </div>
@@ -168,7 +168,7 @@ function Login({ user }: Props) {
                 <div>
                   <button
                     type="submit"
-                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="flex w-full justify-center rounded-sm bg-[#304C89] px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-sky-800 "
                   >
                     Log in
                   </button>

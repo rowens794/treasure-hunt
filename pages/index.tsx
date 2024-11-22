@@ -1,5 +1,4 @@
 import withAuth from "../lib/withAuth";
-// import Navbar from "../components/Navbar";
 import User from "../interfaces/User";
 import NewsTooper from "@/components/NewsTooper";
 import HomePageStory1 from "@/components/HomePageStory1";
@@ -14,14 +13,13 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ user }) => {
-  console.log(user);
   return (
     <div className="relative w-full bg-parchment pb-24">
       <Menu user={user} />
       <NewsTooper />
       <div className="w-full px-8">
         <HomePageStory1 />
-        <HomePageSignup />
+        <HomePageSignup user={user} />
         <HomePageStory2 />
         <HomePageWeather />
         <HomePageStory3 />

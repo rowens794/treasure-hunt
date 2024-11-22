@@ -81,7 +81,7 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
               ) : (
                 <>
                   <MenuItem text="Sign In" href="/login" />
-                  <MenuItem text="Register" href="/register" />
+                  <MenuItem text="Register" href="/signup" />
                 </>
               )}
             </div>
@@ -104,7 +104,7 @@ const MenuItem = ({ text, href }: { text: string; href: string }) => {
       {text === "Logout" ? (
         <button
           onClick={handleLogout}
-          className="text-4xl text-stone-100 pb-2 cursor-pointer"
+          className="text-4xl text-stone-100 pb-2 cursor-pointer text-left"
         >
           {text}
         </button>

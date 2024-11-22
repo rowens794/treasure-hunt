@@ -9,9 +9,9 @@ interface Props {
 
 function Hunt({ user }: Props) {
   return (
-    <>
-      <Navbar user={user} />
-    </>
+    <div className="bg-stone-800 h-screen w-full">
+      <span></span>
+    </div>
   );
 }
 
