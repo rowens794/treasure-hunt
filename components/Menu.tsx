@@ -11,13 +11,9 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <>
-      {/* Menu Button */}
+    <div className="z-[99] w-full fixed max-w-md top-2 flex justify-end">
       {!menuOpen && (
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="absolute top-3 right-3 z-30"
-        >
+        <button onClick={() => setMenuOpen(!menuOpen)} className="z-[100] ">
           <svg
             viewBox="0 0 100 80"
             width="40"
@@ -31,19 +27,18 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
         </button>
       )}
 
-      {/* Overlay Menu */}
       <div
-        className={`fixed top-0 left-0 w-full h-full bg-stone-800 bg-opacity-90 transition-opacity duration-300 ease-in-out ${
+        className={`fixed z-[99] top-0 left-0 w-full h-full bg-stone-800 bg-opacity-90 transition-opacity duration-300 ease-in-out ${
           menuOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="relative flex flex-col h-full">
+        <div className="relative flex flex-col h-full z-[99]">
           {/* Close Button */}
           <button
             onClick={() => setMenuOpen(false)}
-            className="absolute top-3 right-3 z-30"
+            className="absolute top-3 right-3 z-[100]"
           >
             <svg
               viewBox="0 0 100 100"
@@ -56,7 +51,7 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
           </button>
 
           {/* Menu Links */}
-          <div className="pt-24 px-8 flex flex-col">
+          <div className="pt-24 px-8 flex flex-col z-[99]">
             <MenuItem text="Front Page" href="/" />
             <MenuItem text="Community" href="/community" />
             <MenuItem text="Business" href="/business" />
@@ -79,7 +74,7 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

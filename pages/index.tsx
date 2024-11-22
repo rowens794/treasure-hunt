@@ -16,21 +16,16 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ user }) => {
   console.log(user);
   return (
-    <div className="flex flex-col h-screen">
-      {/* Top scrollable section */}
-      <div className="flex-1 overflow-y-scroll relative w-full bg-parchment pb-24">
-        <NewsTooper />
-        <div className="w-full px-8">
-          <HomePageStory1 />
-          <HomePageSignup />
-          <HomePageStory2 />
-          <HomePageWeather />
-          <HomePageStory3 />
-        </div>
-      </div>
-
-      {/* Fixed menu bar */}
+    <div className="relative w-full bg-parchment pb-24">
       <Menu user={user} />
+      <NewsTooper />
+      <div className="w-full px-8">
+        <HomePageStory1 />
+        <HomePageSignup />
+        <HomePageStory2 />
+        <HomePageWeather />
+        <HomePageStory3 />
+      </div>
     </div>
   );
 };
