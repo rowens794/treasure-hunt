@@ -1,5 +1,4 @@
 // import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
 import User from "../interfaces/User";
 import withAuth from "../lib/withAuth";
 
@@ -8,6 +7,7 @@ interface Props {
 }
 
 function Hunt({ user }: Props) {
+  console.log(user);
   return (
     <div className="bg-stone-800 h-screen w-full">
       <span></span>
