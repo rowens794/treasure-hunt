@@ -28,7 +28,7 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
       )}
 
       <div
-        className={`fixed z-[99] top-0 left-0 w-full h-full bg-stone-800 bg-opacity-90 transition-opacity duration-300 ease-in-out ${
+        className={`fixed z-[99] top-0 left-0 w-full h-full bg-stone-800 bg-opacity-100 transition-opacity duration-300 ease-in-out ${
           menuOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
