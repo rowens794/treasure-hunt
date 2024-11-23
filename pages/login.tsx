@@ -1,4 +1,3 @@
-// pages/login.tsx
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import Menu from "../components/Menu";
@@ -25,6 +24,7 @@ function Login({ user }: Props) {
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -40,16 +40,22 @@ function Login({ user }: Props) {
   };
 
   const handleSocialLogin = async (provider: "google" | "facebook") => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/hunt`,
-      },
-    });
+    setError(null); // Clear previous errors
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/hunt`,
+        },
+      });
 
-    if (error) {
-      console.error(`Error with ${provider} login:`, error.message);
-      setError(`Unable to log in with ${provider}. Please try again.`);
+      if (error) {
+        console.error(`Error with ${provider} login:`, error.message);
+        setError(`Unable to log in with ${provider}. Please try again.`);
+      }
+    } catch (err) {
+      console.error(`Unexpected error during ${provider} login:`, err);
+      setError("An unexpected error occurred. Please try again later.");
     }
   };
 
@@ -73,7 +79,6 @@ function Login({ user }: Props) {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           {!user && (
             <>
-              {/* Social Login Buttons */}
               <div className="space-y-3">
                 <button
                   onClick={() => handleSocialLogin("google")}
@@ -91,18 +96,13 @@ function Login({ user }: Props) {
                 </button>
               </div>
 
-              {/* Consistent Separation */}
               <div className="relative mt-12">
-                {/* Separation */}
                 <div className="border-t border-stone-800"></div>
-
-                {/* Explainer Text */}
                 <p className="absolute inset-x-0 -top-2 mx-auto w-max bg-[#f4d3a8] px-2 text-center text-sm text-stone-800 font-serif">
                   Or sign up with your email
                 </p>
               </div>
 
-              {/* Email/Password Login Form */}
               <form
                 className="space-y-6 mt-6 font-serif text-stone-900"
                 onSubmit={handleEmailLogin}
@@ -110,53 +110,39 @@ function Login({ user }: Props) {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm/6 font-medium "
+                    className="block text-sm/6 font-medium"
                   >
                     Email address
                   </label>
-                  <div className="">
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm  ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
-                    />
-                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
+                  />
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between">
-                    <label
-                      htmlFor="password"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Password
-                    </label>
-                    <div className="text-sm">
-                      <a
-                        href="#"
-                        className="font-semibold text-[#304C89] hover:text-sky-800"
-                      >
-                        Forgot password?
-                      </a>
-                    </div>
-                  </div>
-                  <div className="">
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      required
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm  ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
-                    />
-                  </div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm/6 font-medium text-gray-900"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
+                  />
                 </div>
 
                 {error && (
@@ -165,14 +151,12 @@ function Login({ user }: Props) {
                   </p>
                 )}
 
-                <div>
-                  <button
-                    type="submit"
-                    className="flex w-full justify-center rounded-sm bg-[#304C89] px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-sky-800 "
-                  >
-                    Log in
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="flex w-full justify-center rounded-sm bg-[#304C89] px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-sky-800"
+                >
+                  Log in
+                </button>
               </form>
             </>
           )}

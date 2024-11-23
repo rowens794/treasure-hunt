@@ -1,7 +1,6 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import User from "../interfaces/User";
-import withAuth from "../lib/withAuth";
 import { supabase } from "../lib/supabaseClient";
 
 interface HomeProps {
@@ -120,4 +119,4 @@ const MenuItem = ({ text, href }: { text: string; href: string }) => {
   );
 };
 
-export default withAuth(Menu);
+export default Menu;

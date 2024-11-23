@@ -1,6 +1,5 @@
 import React from "react";
 import User from "../interfaces/User";
-import withAuth from "../lib/withAuth";
 
 interface Props {
   user: User;
@@ -31,4 +30,4 @@ function HomePageSignup({ user }: Props) {
   );
 }
 
-export default withAuth(HomePageSignup);
+export default HomePageSignup;

@@ -130,7 +130,6 @@ function Navbar({ user }: { user: User | null }) {
 }
 
 export default Navbar;
-// export default withAuth(Navbar);
 
 const SignUpButton = () => {
   return (
