@@ -34,7 +34,7 @@ function Signup({ user }: Props) {
       console.error("Error signing up:", error.message);
       setError("Unable to create account. Please try again.");
     } else {
-      window.location.href = "/hunt";
+      window.location.href = "/signup-success";
     }
   };
 
