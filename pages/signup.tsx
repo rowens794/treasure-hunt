@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import Menu from "../components/Menu";
+import Menu from "@/components/Menu";
 import { FcGoogle } from "react-icons/fc"; // Google Icon
 import { FaFacebook } from "react-icons/fa"; // Facebook Icon
 import NewsTooper from "@/components/NewsTooper";
-import withAuth from "../lib/withAuth";
-import User from "../interfaces/User";
+import withAuth from "@/lib/withAuth";
+import User from "@/interfaces/User";
 
 interface Props {
   user: User;

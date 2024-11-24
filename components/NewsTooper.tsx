@@ -52,8 +52,8 @@ const SvgFlourish = () => {
       viewBox="0 0 60000 60000"
       x="0px"
       y="0px"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
     >
       <defs>
         <style type="text/css"></style>
@@ -81,7 +81,7 @@ const SvgArrow = ({ className }: { className?: string }) => {
         points="0,0 50,6.25 0,12.5"
         fill="none"
         stroke="black"
-        stroke-width="1"
+        strokeWidth="1"
       />
       <polygon points="0,12.5 50,6.25 0,6.25" fill="black" />
     </svg>
