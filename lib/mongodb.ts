@@ -12,10 +12,13 @@ if (!process.env.MONGODB_URI) {
 
 if (process.env.NODE_ENV === "development") {
   // In development, reuse the MongoDB client across hot reloads
+  //@ts-expect-error _mongoClientPromise does not exist on NodeJS.Global
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
+    //@ts-expect-error _mongoClientPromise does not exist on NodeJS.Global
     global._mongoClientPromise = client.connect();
   }
+  //@ts-expect-error _mongoClientPromise does not exist on NodeJS.Global
   clientPromise = global._mongoClientPromise;
 } else {
   // In production, create a new MongoClient
