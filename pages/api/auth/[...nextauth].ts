@@ -22,9 +22,35 @@ export default NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      const adapter = MongoDBAdapter(clientPromise);
+
+      try {
+        // Check if there is an existing user with the same email
+        const existingUser =
+          adapter.getUserByEmail && user.email
+            ? await adapter.getUserByEmail(user.email)
+            : null;
+
+        if (existingUser) {
+          // If user exists, link the new account to the existing user
+          await adapter.linkAccount({
+            ...account,
+            userId: existingUser.id, // Link the account to the existing user ID
+          });
+        }
+      } catch (error) {
+        console.error("Error linking account:", error);
+        return false; // Deny access if account linking fails
+      }
+
+      return true; // Allow sign-in
+    },
+
     async session({ session, user }) {
+      // Map MongoDB `_id` to `session.user.id`
       //@ts-expect-error MongoDB uses `_id` instead of `id`
-      session.user.id = user.id || user._id; // MongoDB uses `_id`
+      session.user.id = user.id || user._id;
       return session;
     },
   },
