@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 const uri = process.env.MONGODB_URI!;
 const options = {};
 
-let client;
+let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
 if (!process.env.MONGODB_URI) {
@@ -11,14 +11,14 @@ if (!process.env.MONGODB_URI) {
 }
 
 if (process.env.NODE_ENV === "development") {
-  // Reuse the MongoDB client during development to avoid creating multiple connections
+  // In development, reuse the MongoDB client across hot reloads
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
     global._mongoClientPromise = client.connect();
   }
   clientPromise = global._mongoClientPromise;
 } else {
-  // Create a new client for production
+  // In production, create a new MongoClient
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
