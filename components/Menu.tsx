@@ -1,13 +1,13 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import User from "../interfaces/User";
-import { supabase } from "../lib/supabaseClient";
+import { signOut } from "next-auth/react";
+import { Session } from "next-auth"; // Import prebuilt Session type
 
-interface HomeProps {
-  user: User;
+interface Props {
+  user: Session | null;
 }
 
-const Menu: React.FC<HomeProps> = ({ user }) => {
+const Menu = ({ user }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -75,7 +75,12 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
               {user ? (
                 <>
                   <MenuItem text="Messages" href="/messages" />
-                  <MenuItem text="Logout" href="/logout" />
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="text-4xl text-stone-100 pb-2 cursor-pointer text-left"
+                  >
+                    Logout
+                  </button>
                 </>
               ) : (
                 <>
@@ -92,30 +97,10 @@ const Menu: React.FC<HomeProps> = ({ user }) => {
 };
 
 const MenuItem = ({ text, href }: { text: string; href: string }) => {
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.log("Error logging out:", error.message);
-    if (!error) window.location.href = "/";
-  };
-
   return (
-    <>
-      {text === "Logout" ? (
-        <button
-          onClick={handleLogout}
-          className="text-4xl text-stone-100 pb-2 cursor-pointer text-left"
-        >
-          {text}
-        </button>
-      ) : (
-        <Link
-          href={href}
-          className="text-4xl text-stone-100 pb-2 cursor-pointer"
-        >
-          {text}
-        </Link>
-      )}
-    </>
+    <Link href={href} className="text-4xl text-stone-100 pb-2 cursor-pointer">
+      {text}
+    </Link>
   );
 };
 

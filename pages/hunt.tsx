@@ -1,13 +1,12 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import User from "../interfaces/User";
-import withAuth from "../lib/withAuth";
+import { Session } from "next-auth"; // Import prebuilt Session type
 import Controls from "@/components/hunt/Controls";
 import VideoWithControls from "@/components/hunt/VideoWithControls";
 
 interface Props {
-  user: User;
+  user: Session | null;
   authenticated: boolean;
 }
 
@@ -28,4 +27,4 @@ function Hunt({ user, authenticated }: Props) {
   );
 }
 
-export default withAuth(Hunt);
+export default Hunt;

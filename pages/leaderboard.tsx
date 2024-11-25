@@ -1,19 +1,18 @@
 // pages/signup.js
 // import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
-import User from "../interfaces/User";
-import withAuth from "../lib/withAuth";
+import { Session } from "next-auth"; // Import prebuilt Session type
 
 interface Props {
-  user: User;
+  user: Session | null;
 }
 
 function Leaderboard({ user }: Props) {
+  console.log(user);
   return (
     <>
-      <Navbar user={user} />
+      <span>Leaderboard</span>
     </>
   );
 }
 
-export default withAuth(Leaderboard);
+export default Leaderboard;

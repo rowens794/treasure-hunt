@@ -1,19 +1,18 @@
 // pages/signup.js
 // import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
-import User from "../interfaces/User";
-import withAuth from "../lib/withAuth";
+import { Session } from "next-auth";
 
 interface Props {
-  user: User;
+  user: Session | null;
 }
 
 function Rules({ user }: Props) {
+  console.log(user);
   return (
     <>
-      <Navbar user={user} />
+      <span>rules</span>{" "}
     </>
   );
 }
 
-export default withAuth(Rules);
+export default Rules;

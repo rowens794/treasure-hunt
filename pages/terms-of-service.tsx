@@ -1,11 +1,10 @@
 import React from "react";
 import NewsTooper from "@/components/NewsTooper";
 import Menu from "@/components/Menu";
-import withAuth from "@/lib/withAuth";
-import User from "@/interfaces/User";
+import { Session } from "next-auth";
 
 interface Props {
-  user: User;
+  user: Session | null;
 }
 
 function TermsOfService({ user }: Props) {
@@ -114,4 +113,4 @@ function TermsOfService({ user }: Props) {
   );
 }
 
-export default withAuth(TermsOfService);
+export default TermsOfService;

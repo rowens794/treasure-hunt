@@ -1,44 +1,14 @@
 interface User {
-  id: string;
-  aud: string;
-  role: string;
-  email: string;
-  email_confirmed_at: string | null;
-  phone: string;
-  confirmation_sent_at: string | null;
-  confirmed_at: string | null;
-  last_sign_in_at: string | null;
-  app_metadata: {
-    provider: string;
-    providers: string[];
-  };
-  user_metadata: {
-    email: string;
-    email_verified: boolean;
-    phone_verified: boolean;
-    sub: string;
-  };
-  identities: Identity[];
-  created_at: string;
-  updated_at: string;
-  is_anonymous: boolean;
+  id: string; // Google User ID
+  name: string; // User's name
+  email: string; // User's email
+  image: string; // User's avatar image URL
 }
 
-interface Identity {
-  identity_id: string;
-  id: string;
-  user_id: string;
-  identity_data: {
-    email: string;
-    email_verified: boolean;
-    phone_verified: boolean;
-    sub: string;
-  };
-  provider: string;
-  last_sign_in_at: string;
-  created_at: string;
-  updated_at: string;
-  email: string;
+interface Session {
+  user: Session | null;
+  // The user object
+  expires: string; // Session expiration date in ISO format
 }
 
-export default User;
+export type { User, Session };

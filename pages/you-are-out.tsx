@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 
-import Navbar from "../components/Navbar";
-import User from "../interfaces/User";
-import withAuth from "../lib/withAuth";
+import { Session } from "next-auth";
 
-function Signout({ user }: { user: User }) {
+interface Props {
+  user: Session | null;
+}
+
+function Signout({ user }: { user: Props }) {
   useEffect(() => {
     if (user) {
       window.location.href = "/";
@@ -13,8 +15,6 @@ function Signout({ user }: { user: User }) {
 
   return (
     <>
-      <Navbar user={user} />
-
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <h1>You&apos;re Out!</h1>
         <p>We have officially forgotten everything about you.</p>
@@ -24,4 +24,4 @@ function Signout({ user }: { user: User }) {
   );
 }
 
-export default withAuth(Signout);
+export default Signout;

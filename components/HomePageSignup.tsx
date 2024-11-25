@@ -1,8 +1,8 @@
 import React from "react";
-import User from "../interfaces/User";
+import { Session } from "next-auth"; // Import prebuilt Session type
 
 interface Props {
-  user: User;
+  user: Session | null;
 }
 
 function HomePageSignup({ user }: Props) {

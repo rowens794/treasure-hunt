@@ -1,71 +1,47 @@
-import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient";
-import Menu from "../components/Menu";
+import { useEffect, useState } from "react";
+import { useSession, signIn } from "next-auth/react";
+// import Menu from "../components/Menu";
 import { FcGoogle } from "react-icons/fc"; // Google Icon
 import { FaFacebook } from "react-icons/fa"; // Facebook Icon
-import User from "../interfaces/User";
-import withAuth from "../lib/withAuth";
 import NewsTooper from "@/components/NewsTooper";
 
-interface Props {
-  user: User;
-}
-
-function Login({ user }: Props) {
+function Login() {
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (user) {
+    if (status === "authenticated") {
       window.location.href = "/hunt";
     }
-  }, [user]);
+  }, [status]);
 
-  const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null); // Clear previous errors
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      console.error("Error logging in:", error.message);
-      setError("Invalid email or password. Please try again.");
-    } else {
-      window.location.href = "/hunt";
-    }
+  const handleSocialLogin = (provider: "google" | "facebook") => {
+    signIn(provider);
   };
 
-  const handleSocialLogin = async (provider: "google" | "facebook") => {
-    setError(null); // Clear previous errors
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/hunt`,
-        },
-      });
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await signIn("email", {
+      email,
+      redirect: false, // Prevent immediate redirection
+      callbackUrl: "/hunt", // Redirect after successful login
+    });
 
-      if (error) {
-        console.error(`Error with ${provider} login:`, error.message);
-        setError(`Unable to log in with ${provider}. Please try again.`);
-      }
-    } catch (err) {
-      console.error(`Unexpected error during ${provider} login:`, err);
-      setError("An unexpected error occurred. Please try again later.");
+    if (res?.error) {
+      setMessage("Failed to send magic link. Please try again.");
+    } else {
+      setMessage("Magic link sent! Check your email.");
     }
   };
 
   return (
     <>
       <NewsTooper />
-      <Menu user={user} />
+      {/* <Menu user={session?.user || null} /> */}
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-8 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          {user ? (
+          {session ? (
             <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900 girassol-regular">
               You&apos;re already logged in!
             </h2>
@@ -77,7 +53,7 @@ function Login({ user }: Props) {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {!user && (
+          {!session && (
             <>
               <div className="space-y-3">
                 <button
@@ -103,61 +79,25 @@ function Login({ user }: Props) {
                 </p>
               </div>
 
-              <form
-                className="space-y-6 mt-6 font-serif text-stone-900"
-                onSubmit={handleEmailLogin}
-              >
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm/6 font-medium"
-                  >
-                    Email address
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full border rounded-sm py-1.5 text-stone-900 shadow-sm ring-gray-300 placeholder:text-stone-400 sm:text-sm/6 pl-4 bg-[#FEFBF6]"
-                  />
-                </div>
-
-                {error && (
-                  <p className="mt-2 text-sm text-red-600" role="alert">
-                    {error}
-                  </p>
-                )}
-
+              <form onSubmit={handleMagicLink} className="space-y-6 mt-6">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  className="w-full border rounded-sm py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                />
                 <button
                   type="submit"
-                  className="flex w-full justify-center rounded-sm bg-[#304C89] px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-sky-800"
+                  className="w-full bg-blue-500 text-white rounded-sm py-2 font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-700"
                 >
-                  Log in
+                  Send Magic Link
                 </button>
               </form>
+              {message && (
+                <p className="mt-4 text-center text-green-500">{message}</p>
+              )}
             </>
           )}
         </div>
@@ -166,4 +106,4 @@ function Login({ user }: Props) {
   );
 }
 
-export default withAuth(Login);
+export default Login;

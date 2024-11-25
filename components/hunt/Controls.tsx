@@ -8,10 +8,10 @@ import {
 } from "react-icons/sl";
 import Link from "next/link";
 
-import User from "@/interfaces/User";
+import { Session } from "next-auth";
 
 type Props = {
-  user: User | null; // or the specific type for your user object
+  user: Session | null; // or the specific type for your user object
 };
 
 const ControlsComponent = ({ user }: Props) => {
@@ -56,7 +56,7 @@ const Button = ({
 };
 
 interface TriggerButtonProps {
-  user: User | null;
+  user: Session | null;
 }
 
 const TriggerButton = ({ user }: TriggerButtonProps) => {
