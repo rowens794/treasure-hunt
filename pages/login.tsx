@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { FcGoogle } from "react-icons/fc"; // Google Icon
+import { FcGoogle } from "react-icons/fc";
+import { SlRefresh } from "react-icons/sl"; // Google Icon
 import { FaFacebook } from "react-icons/fa"; // Facebook Icon
 import NewsTooper from "@/components/NewsTooper";
 
@@ -40,9 +41,9 @@ function Login() {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-8 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           {session ? (
-            <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900 girassol-regular">
-              You&apos;re already logged in!
-            </h2>
+            <div className="w-full flex justify-center">
+              <SlRefresh className="h-12 w-12 text-stone-700 animate-spin" />
+            </div>
           ) : (
             <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900 girassol-regular">
               Sign in to your account
