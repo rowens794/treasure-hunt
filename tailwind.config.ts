@@ -13,6 +13,16 @@ export default {
         foreground: "var(--foreground)",
         parchment: "#F4D3A8",
       },
+      keyframes: {
+        "spin-with-delay": {
+          "0%": { transform: "rotate(0deg)" },
+          "66.666%": { transform: "rotate(360deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+      },
+      animation: {
+        "spin-with-delay": "spin-with-delay 1.5s linear infinite",
+      },
     },
   },
   images: {

@@ -1,7 +1,13 @@
 import { memo, useRef, useState, useEffect } from "react";
 import { FaPlay, FaPause } from "react-icons/fa";
 
-const VideoWithControlsComponent = () => {
+const VideoWithControlsComponent = ({
+  videoUrl,
+  videoPosterUrl,
+}: {
+  videoUrl: string;
+  videoPosterUrl: string;
+}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -40,15 +46,12 @@ const VideoWithControlsComponent = () => {
     <div className="absolute inset-0 z-0 h-dvh overflow-y-hidden">
       <video
         ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover blur-[.5px] opacity-60"
+        className={`absolute inset-0 w-full h-full object-cover blur-[.5px] opacity-60 `}
         playsInline
         preload="metadata"
-        poster="https://swcidwtkwnkor2xg.public.blob.vercel-storage.com/video-poster-URvCyn21eUbv5fnCaeqZHvt4v8AnT9.png"
+        poster={videoPosterUrl}
       >
-        <source
-          src="https://swcidwtkwnkor2xg.public.blob.vercel-storage.com/Video%202-hr2S3hU7Chu2qWtlRcPrvB6TCfUFSJ.mp4"
-          type="video/mp4"
-        />
+        <source src={videoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       <div className="absolute inset-0 bg-dot-pattern mix-blend-multiply pointer-events-none"></div>

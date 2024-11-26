@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import {
   SlHome,
   SlList,
@@ -8,19 +8,18 @@ import {
 } from "react-icons/sl";
 import Link from "next/link";
 
-import { Session } from "next-auth";
+const ControlsComponent = () => {
+  const [triggerLoading, setTriggerLoading] = useState(false);
 
-type Props = {
-  user: Session | null; // or the specific type for your user object
-};
-
-const ControlsComponent = ({ user }: Props) => {
   return (
     <div className="h-12 absolute bottom-8 mx-auto w-full px-4 z-10 pointer-events-none">
       <div className="grid grid-cols-6 bg-parchment opacity-85 border-t-2 border-b-2 border-stone-700 w-full h-full pointer-events-auto shadow-md">
         <Button text="Home" Icon={SlHome} link="/" />
         <Button text="Leaders" Icon={SlList} link="/hunt/leaderboard" />
-        <TriggerButton user={user} />
+        <TriggerButton
+          loading={triggerLoading}
+          setLoading={setTriggerLoading}
+        />
         <Button text="Messages" Icon={SlEnvolope} link="/hunt/messages" />
         <Button text="Help" Icon={SlQuestion} link="/hunt/help" />
       </div>
@@ -55,19 +54,47 @@ const Button = ({
   );
 };
 
-interface TriggerButtonProps {
-  user: Session | null;
-}
-
-const TriggerButton = ({ user }: TriggerButtonProps) => {
-  const handleClick = () => {
+const TriggerButton = ({
+  loading,
+  setLoading,
+}: {
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+}) => {
+  const handleClick = async () => {
     if ("geolocation" in navigator) {
-      console.log(user);
+      setLoading(true);
+
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log("Position retrieved successfully", position);
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          try {
+            const response = await fetch("/api/check-location", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include", // Include credentials (cookies) in the request
+              body: JSON.stringify({
+                latitude,
+                longitude,
+              }),
+            });
+
+            const data = await response.json();
+
+            // TODO: Show success animation and progress to next clue
+            alert(data.message);
+          } catch (error) {
+            console.error("Error checking location:", error);
+            alert("An error occurred while checking your location.");
+          } finally {
+            setLoading(false);
+          }
         },
         (error) => {
+          setLoading(false);
           switch (error.code) {
             case error.PERMISSION_DENIED:
               alert(
@@ -76,13 +103,16 @@ const TriggerButton = ({ user }: TriggerButtonProps) => {
               console.error("User denied the request for Geolocation.");
               break;
             case error.POSITION_UNAVAILABLE:
-              alert("POSITION_UNAVAILABLE.");
+              alert("Location information is unavailable.");
               console.error("Location information is unavailable.");
               break;
             case error.TIMEOUT:
-              alert("TIMEOUT.");
+              alert("The request to get user location timed out.");
               console.error("The request to get user location timed out.");
               break;
+            default:
+              alert("An unknown error occurred.");
+              console.error("An unknown geolocation error occurred.");
           }
         }
       );
@@ -93,10 +123,18 @@ const TriggerButton = ({ user }: TriggerButtonProps) => {
 
   return (
     <div className="col-span-2 pointer-events-auto transform -translate-y-3 mx-2 flex justify-center">
-      <button onClick={handleClick} className="pointer-events-auto">
+      <button
+        onClick={loading ? undefined : handleClick}
+        className="pointer-events-auto"
+        disabled={loading}
+      >
         <div className="bg-stone-700 rounded-full h-18 w-18 p-0.5">
           <div className="bg-stone-900 rounded-full h-18 w-18 p-4 flex justify-center">
-            <SlLocationPin className="text-4xl  text-stone-100" />
+            <SlLocationPin
+              className={`text-4xl text-stone-100 ${
+                loading ? "animate-spin-with-delay" : ""
+              }`}
+            />
           </div>
         </div>
       </button>

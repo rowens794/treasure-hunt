@@ -15,7 +15,6 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = () => {
   const { data: session } = useSession();
-  console.log(session);
 
   return (
     <div className="relative w-full bg-parchment pb-24">

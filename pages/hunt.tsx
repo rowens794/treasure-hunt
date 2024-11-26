@@ -1,30 +1,74 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
-
-import { Session } from "next-auth"; // Import prebuilt Session type
 import Controls from "@/components/hunt/Controls";
-import VideoWithControls from "@/components/hunt/VideoWithControls";
+import Video from "@/components/hunt/Video";
 
 interface Props {
-  user: Session | null;
-  authenticated: boolean;
+  apiData: {
+    authenticated: boolean;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      image: string;
+    };
+    currentClue: {
+      clueId: number;
+      clueType: string;
+      componentTemplate: string;
+      videoUrl: string;
+      videoPosterUrl: string;
+    };
+  };
 }
 
-function Hunt({ user, authenticated }: Props) {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!authenticated) {
-      router.push("/");
-    }
-  }, [authenticated, router]);
-
+function Hunt({ apiData }: Props) {
   return (
-    <div className=" h-dvh w-full relative overflow-y-hidden">
-      <VideoWithControls />
-      <Controls user={user} />
+    <div className="h-dvh w-full relative overflow-y-hidden">
+      <Video
+        videoPosterUrl={apiData.currentClue.videoPosterUrl}
+        videoUrl={apiData.currentClue.videoUrl}
+      />
+      <Controls />
     </div>
   );
 }
 
 export default Hunt;
+
+// Fetch data server-side
+import { GetServerSidePropsContext } from "next";
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  try {
+    // Make a call to your API route
+    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/hunt-status`, {
+      headers: {
+        cookie: context.req.headers.cookie || "", // Forward cookies for session handling
+      },
+    });
+
+    const apiData = await res.json();
+
+    // Redirect if the user is not authenticated
+    if (!apiData.authenticated) {
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: {
+        apiData,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching API data:", error);
+    return {
+      props: {
+        apiData: { error: "Failed to fetch data" },
+      },
+    };
+  }
+}

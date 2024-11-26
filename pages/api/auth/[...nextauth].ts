@@ -1,11 +1,13 @@
-import NextAuth from "next-auth";
+// pages/api/auth/[...nextauth].ts
+
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import EmailProvider from "next-auth/providers/email";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "../../../lib/mongodb"; // MongoDB connection utility
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise), // Use the MongoDB adapter
   providers: [
     GoogleProvider({
@@ -49,9 +51,12 @@ export default NextAuth({
 
     async session({ session, user }) {
       // Map MongoDB `_id` to `session.user.id`
-      //@ts-expect-error MongoDB uses `_id` instead of `id`
+      // @ts-expect-error MongoDB uses `_id` instead of `id`
       session.user.id = user.id || user._id;
       return session;
     },
   },
-});
+};
+
+// Export NextAuth with the authOptions
+export default NextAuth(authOptions);
