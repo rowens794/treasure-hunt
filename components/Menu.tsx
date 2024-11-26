@@ -69,7 +69,7 @@ const Menu = ({ user }: Props) => {
             <MenuItem text="Community" href="/community" />
             <MenuItem text="Business" href="/business" />
             <MenuItem text="Opinion" href="/opinion" />
-            <MenuItem text="The Hunt" href="/hunt" />
+            {user && <MenuItem text="The Hunt" href="/hunt" />}
 
             <div className="mt-12 flex flex-col">
               {user ? (
