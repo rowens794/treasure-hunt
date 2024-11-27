@@ -1,37 +1,14 @@
 // pages/api/check-location.ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth"; // Correct import for server-side
-import { authOptions } from "../api/auth/[...nextauth]"; // Adjust the path as necessary
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
-
-interface HuntStatus {
-  _id?: ObjectId; // MongoDB document ID
-  userId: string;
-  lastSolvedClue: Date;
-  currentClue: number;
-  createdAt: Date;
-  updatedAt: Date;
-  clueProgress: Date[];
-}
-
-interface Clue {
-  _id?: ObjectId;
-  clueId: number;
-  clueType: string;
-  componentTemplate: string;
-  videoUrl: string;
-  videoPosterUrl: string;
-  targetCoords: {
-    latitude: number;
-    longitude: number;
-  };
-  acceptableRadius: number; // in feet
-}
+import { Db } from "mongodb";
+import { HuntStatus, Clue, LocationCheck } from "@/interfaces/Hunt";
 
 interface ApiResponse {
   authenticated: boolean | null;
-  message?: string;
+  status?: string;
 }
 
 export default async function handler(
@@ -42,63 +19,37 @@ export default async function handler(
   if (req.method !== "POST") {
     return res
       .status(405)
-      .json({ authenticated: null, message: "Method Not Allowed" });
+      .json({ authenticated: null, status: "Method Not Allowed" });
   }
 
-  // Use getServerSession instead of getSession
-  const session = await getServerSession(req, res, authOptions);
-
-  if (!session || !session.user) {
-    return res
-      .status(401)
-      .json({ authenticated: false, message: "Unauthorized" });
+  // Get user ID from session
+  const userId = await getUserIdFromSession(req, res);
+  if (!userId) {
+    return; // Response already sent in getUserIdFromSession
   }
 
-  const userId = session.user.id; // Adjust this based on how your user ID is stored
-
-  const { latitude, longitude } = req.body;
-
-  if (typeof latitude !== "number" || typeof longitude !== "number") {
+  // Parse and validate coordinates
+  const coordinates = parseCoordinates(req.body);
+  if (!coordinates) {
     return res
       .status(400)
-      .json({ authenticated: true, message: "Invalid coordinates" });
+      .json({ authenticated: true, status: "Invalid coordinates" });
   }
+  const { latitude, longitude } = coordinates;
 
   try {
-    // Connect to MongoDB using the reusable clientPromise
-    const client = await clientPromise;
-    const db = client.db("test"); // Replace with your actual database name
+    const db = await getDatabase();
 
-    // Access the HuntStatus collection
-    const huntStatusCollection = db.collection<HuntStatus>("HuntStatus");
+    // Get or create user's hunt status
+    const huntStatus = await getOrCreateUserHuntStatus(db, userId);
 
-    // Query the hunts collection for the user's hunt status
-    let huntStatus = await huntStatusCollection.findOne({ userId: userId });
-
-    if (!huntStatus) {
-      // Create a new record if none exists
-      const defaultStatus: HuntStatus = {
-        userId: userId,
-        currentClue: 0,
-        lastSolvedClue: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        clueProgress: [],
-      };
-      const insertResult = await huntStatusCollection.insertOne(defaultStatus);
-      huntStatus = { ...defaultStatus, _id: insertResult.insertedId }; // Include the inserted document's ID
-    }
-
-    // Retrieve the current clue information from the Clues collection
-    const cluesCollection = db.collection<Clue>("Clues");
-    const currentClue = await cluesCollection.findOne({
-      clueId: huntStatus.currentClue,
-    });
+    // Get the current clue
+    const currentClue = await getClueById(db, huntStatus.currentClue);
 
     if (!currentClue) {
       return res
         .status(404)
-        .json({ authenticated: true, message: "Current clue not found" });
+        .json({ authenticated: true, status: "Current clue not found" });
     }
 
     const { targetCoords, acceptableRadius } = currentClue;
@@ -107,42 +58,143 @@ export default async function handler(
     const distanceInFeet = calculateDistanceInFeet(
       latitude,
       longitude,
-      targetCoords.latitude,
-      targetCoords.longitude
+      targetCoords.lat,
+      targetCoords.lng
     );
 
-    // Check if the user is within the acceptable radius
-    if (distanceInFeet <= acceptableRadius) {
+    // Determine if the user is within the acceptable radius
+    const isSuccessful = distanceInFeet <= acceptableRadius;
+
+    // Log the location check
+    await logLocationCheck(db, {
+      userId,
+      clueId: huntStatus.currentClue,
+      timestamp: new Date(),
+      coords: { lat: latitude, lng: longitude },
+      success: isSuccessful,
+    });
+
+    if (isSuccessful) {
       // Update the user's hunt status (e.g., move to the next clue)
-      await huntStatusCollection.updateOne(
-        { userId: userId },
-        {
-          $set: {
-            currentClue: huntStatus.currentClue + 1,
-            updatedAt: new Date(),
-            lastSolvedClue: new Date(),
-          },
-          $push: { clueProgress: new Date() },
-        }
-      );
+      await updateUserHuntStatus(db, userId, huntStatus.currentClue + 1);
 
       return res.status(200).json({
         authenticated: true,
-        message: "Congratulations! You've found the clue!",
+        status: "success",
       });
     } else {
       return res.status(200).json({
         authenticated: true,
-        message: "You are not at the correct location yet. Keep looking!",
+        status: "failure",
       });
     }
   } catch (error) {
     console.error("Error checking location:", error);
     return res.status(500).json({
       authenticated: true,
-      message: "Internal Server Error",
+      status: "error",
     });
   }
+}
+
+// Helper function to get the database
+async function getDatabase(): Promise<Db> {
+  const client = await clientPromise;
+  const db = client.db("test"); // Replace with your actual database name
+  return db;
+}
+
+// Helper function to get user ID from session
+async function getUserIdFromSession(
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<string | null> {
+  const session = await getServerSession(req, res, authOptions);
+
+  if (!session || !session.user) {
+    res.status(401).json({ authenticated: false, status: "Unauthorized" });
+    return null;
+  }
+
+  return session.user.id;
+}
+
+// Helper function to parse and validate coordinates
+function parseCoordinates(body: {
+  latitude: number;
+  longitude: number;
+}): { latitude: number; longitude: number } | null {
+  const { latitude, longitude } = body;
+
+  if (typeof latitude !== "number" || typeof longitude !== "number") {
+    return null;
+  }
+
+  return { latitude, longitude };
+}
+
+// Helper function to get or create user's hunt status
+async function getOrCreateUserHuntStatus(
+  db: Db,
+  userId: string
+): Promise<HuntStatus> {
+  const huntStatusCollection = db.collection<HuntStatus>("HuntStatus");
+
+  let huntStatus = await huntStatusCollection.findOne({ userId: userId });
+
+  if (!huntStatus) {
+    // Create a new record if none exists
+    const defaultStatus: HuntStatus = {
+      userId: userId,
+      currentClue: 0,
+      lastSolvedClue: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      clueProgress: [],
+    };
+    const insertResult = await huntStatusCollection.insertOne(defaultStatus);
+    huntStatus = { ...defaultStatus, _id: insertResult.insertedId };
+  }
+
+  return huntStatus;
+}
+
+// Helper function to get clue by ID
+async function getClueById(db: Db, clueId: number): Promise<Clue | null> {
+  const cluesCollection = db.collection<Clue>("Clues");
+  const clue = await cluesCollection.findOne({ clueId });
+  return clue;
+}
+
+// Helper function to update user's hunt status
+async function updateUserHuntStatus(
+  db: Db,
+  userId: string,
+  nextClueNumber: number
+): Promise<void> {
+  const huntStatusCollection = db.collection<HuntStatus>("HuntStatus");
+
+  await huntStatusCollection.updateOne(
+    { userId },
+    {
+      $set: {
+        currentClue: nextClueNumber,
+        updatedAt: new Date(),
+        lastSolvedClue: new Date(),
+      },
+      $push: { clueProgress: new Date() },
+    }
+  );
+}
+
+// Helper function to log the location check
+async function logLocationCheck(
+  db: Db,
+  locationCheck: LocationCheck
+): Promise<void> {
+  const locationChecksCollection =
+    db.collection<LocationCheck>("LocationChecks");
+  await locationChecksCollection.insertOne(locationCheck);
 }
 
 // Helper function to calculate distance between two coordinates in feet
