@@ -12,18 +12,24 @@ if (!process.env.MONGODB_URI) {
 
 if (process.env.NODE_ENV === "development") {
   // In development, reuse the MongoDB client across hot reloads
-  //@ts-expect-error _mongoClientPromise does not exist on NodeJS.Global
+  //@ts-expect-error - globalThis is not defined in Next.js
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
-    //@ts-expect-error _mongoClientPromise does not exist on NodeJS.Global
+    //@ts-expect-error - globalThis is not defined in Next.js
     global._mongoClientPromise = client.connect();
   }
-  //@ts-expect-error _mongoClientPromise does not exist on NodeJS.Global
+  //@ts-expect-error - globalThis is not defined in Next.js
   clientPromise = global._mongoClientPromise;
 } else {
-  // In production, create a new MongoClient
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+  // In production, reuse the MongoDB client across function calls
+  //@ts-expect-error - globalThis is not defined in Next.js
+  if (!global._mongoClientPromise) {
+    client = new MongoClient(uri, options);
+    //@ts-expect-error - globalThis is not defined in Next.js
+    global._mongoClientPromise = client.connect();
+  }
+  //@ts-expect-error - globalThis is not defined in Next.js
+  clientPromise = global._mongoClientPromise;
 }
 
 export default clientPromise;
