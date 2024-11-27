@@ -1,4 +1,3 @@
-// components/TriggerButton.tsx
 import { SlLocationPin } from "react-icons/sl";
 import { runConfetti } from "../../lib/confetti";
 

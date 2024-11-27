@@ -1,4 +1,3 @@
-//@ts-expect-error - This library has no types
 import confetti from "canvas-confetti";
 
 export const runConfetti = () => {
