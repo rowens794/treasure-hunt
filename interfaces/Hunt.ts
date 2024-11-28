@@ -1,7 +1,5 @@
-import { ObjectId } from "mongodb";
-
 interface HuntStatus {
-  _id?: ObjectId;
+  _id?: string;
   userId: string;
   name: string;
   email: string;
@@ -14,7 +12,7 @@ interface HuntStatus {
 }
 
 interface Clue {
-  _id?: ObjectId;
+  _id?: string;
   clueId: number;
   clueType: string;
   componentTemplate: string;
@@ -28,7 +26,7 @@ interface Clue {
 }
 
 interface LocationCheck {
-  _id?: ObjectId;
+  _id?: string;
   userId: string;
   clueId: number;
   timestamp: Date;

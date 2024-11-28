@@ -15,13 +15,13 @@ const SlammingX = ({ setShowSlammingX }: SlammingXProps) => {
   }, [setShowSlammingX]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent opacity-95">
       <Image
         src="/painted-x.png" // Ensure the image is in the public folder
         alt="Incorrect location"
         width={300} // Adjust width and height as needed
         height={300}
-        className="animate-slamming-x"
+        className="animate-slamming-x filter hue-rotate-30 brightness-125"
       />
     </div>
   );
