@@ -49,7 +49,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     const apiData = await res.json();
 
     // Redirect if the user is not authenticated
-    if (!apiData.authenticated) {
+    if (!apiData.currentClue._id) {
+      console.log("User is not authenticated, redirecting...");
       return {
         redirect: {
           destination: "/",

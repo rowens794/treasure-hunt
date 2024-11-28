@@ -1,29 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
-import clientPromise from "@/lib/mongodb"; // Reuse your MongoDB utility
-import { User } from "@/interfaces/User";
-import { ObjectId } from "mongodb";
-
-interface HuntStatus {
-  _id?: ObjectId; // MongoDB document ID
-  userId: string;
-  lastSolvedClue: Date;
-  currentClue: number;
-  createdAt: Date;
-  updatedAt: Date;
-  clueProgress: Date[];
-}
+import { Clue } from "@/interfaces/Hunt";
+import { Session } from "next-auth";
 
 interface ApiResponse {
-  authenticated: boolean | null;
-  user?: User | null;
-  currentClue?: {
-    clueId: number;
-    clueType: string;
-    componentTemplate: string;
-    videoUrl: string;
-    videoPosterUrl: string;
-  } | null;
+  currentClue?: Clue;
+  authenticated?: boolean;
 }
 
 export default async function handler(
@@ -31,65 +13,44 @@ export default async function handler(
   res: NextApiResponse<ApiResponse>
 ) {
   const session = await getSession({ req });
-  console.log(session);
+  const user = session && session.user ? session.user : null;
 
-  if (!session || !session.user) {
+  if (!user) {
     return res.status(401).json({ authenticated: false });
+  } else {
+    try {
+      const clue = await getClue(session);
+
+      res.status(200).json({ currentClue: clue });
+    } catch (error) {
+      console.error("Error fetching or creating hunt status:", error);
+      res.status(500).json({
+        authenticated: false,
+      });
+    }
   }
+}
+
+async function getClue(session: Session | null): Promise<Clue> {
+  const user = session ? session.user : {};
 
   try {
-    // Connect to MongoDB using the reusable clientPromise
-    const client = await clientPromise;
-    const db = client.db("test"); // Replace with your actual database name
-    const collection = db.collection<HuntStatus>("HuntStatus"); // Explicitly type the collection
-
-    // Query the hunts collection for the user's hunt status
-    let huntStatus = await collection.findOne({ userId: session.user.id });
-
-    if (!huntStatus) {
-      // Create a new record if none exists
-      const defaultStatus: HuntStatus = {
-        userId: session.user.id,
-        currentClue: 0,
-        lastSolvedClue: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        clueProgress: [],
-      };
-      const insertResult = await collection.insertOne(defaultStatus);
-      huntStatus = { ...defaultStatus, _id: insertResult.insertedId }; // Include the inserted document's ID
-    }
-
-    //once the hunt status is fetched or created, retrieve the clue information from the Clues collection
-    const cluesCollection = db.collection("Clues");
-    const currentClue = await cluesCollection.findOne({
-      clueId: huntStatus.currentClue,
+    const response = await fetch(`${process.env.PROXY_URL}/hunt-status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...user,
+        secret: process.env.PROXY_SECRET,
+      }),
     });
 
-    //add currentClue to the huntStatus object
+    const data = await response.json();
 
-    res.status(200).json({
-      authenticated: true,
-      user: {
-        id: session.user.id,
-        name: session.user.name || "",
-        email: session.user.email || "",
-        image: session.user.image || "",
-      },
-      currentClue: {
-        clueId: currentClue ? currentClue.clueId : 0,
-        clueType: currentClue ? currentClue.clueType : "",
-        componentTemplate: currentClue ? currentClue.componentTemplate : "",
-        videoUrl: currentClue ? currentClue.videoUrl : "",
-        videoPosterUrl: currentClue ? currentClue.videoPosterUrl : "",
-      },
-    });
+    return data.currentClue;
   } catch (error) {
-    console.error("Error fetching or creating hunt status:", error);
-    res.status(500).json({
-      authenticated: null,
-      user: null,
-      currentClue: null,
-    });
+    console.error("Error getting hunt status:", error);
+    throw new Error("Error getting hunt status");
   }
 }

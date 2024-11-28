@@ -3,6 +3,9 @@ import { ObjectId } from "mongodb";
 interface HuntStatus {
   _id?: ObjectId;
   userId: string;
+  name: string;
+  email: string;
+  image: string;
   lastSolvedClue: Date;
   currentClue: number;
   createdAt: Date;
