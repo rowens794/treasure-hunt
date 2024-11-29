@@ -22,9 +22,10 @@ interface Props {
 }
 
 function Hunt({ apiData }: Props) {
+  console.log(apiData);
   return (
     <div className="h-dvh w-full relative overflow-y-hidden">
-      {apiData ? (
+      {apiData && apiData.currentClue ? (
         <Video
           videoPosterUrl={apiData.currentClue.videoPosterUrl}
           videoUrl={apiData.currentClue.videoUrl}
