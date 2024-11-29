@@ -24,11 +24,27 @@ export default {
           "50%": { transform: "scale(1.2) rotate(15deg)", opacity: "1" },
           "100%": { transform: "scale(1) rotate(0deg)", opacity: "1" },
         },
+        "slide-in": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0%)" },
+        },
+        "pulse-once": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.2)" },
+          "100%": { transform: "scale(1)" },
+        },
+        "spin-with-delay-2": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "spin-with-delay": "spin-with-delay 1.5s linear infinite",
         "slamming-x":
           "slamming-x 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards",
+        "slide-in": "slide-in var(--cooldown-duration) linear forwards",
+        "pulse-once": "pulse-once 0.5s ease-in-out",
+        "spin-with-delay-2": "spin-with-delay 1s linear infinite",
       },
     },
   },

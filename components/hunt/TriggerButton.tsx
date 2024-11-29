@@ -17,7 +17,8 @@ const TriggerButton = ({
   const cooldownDuration = 10000; // Adjust this value to change the cooldown length
 
   const [cooldown, setCooldown] = useState(false);
-  const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isCooldownOver, setIsCooldownOver] = useState(false);
+  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClick = async () => {
     if ("geolocation" in navigator) {
@@ -64,10 +65,7 @@ const TriggerButton = ({
           } finally {
             setLoading(false);
             // Start the cooldown after the loading is finished
-            setCooldown(true);
-            cooldownTimerRef.current = setTimeout(() => {
-              setCooldown(false);
-            }, cooldownDuration);
+            startCooldown();
           }
         },
         (error) => {
@@ -92,15 +90,20 @@ const TriggerButton = ({
               console.error("An unknown geolocation error occurred.");
           }
           // Start the cooldown even if there's an error
-          setCooldown(true);
-          cooldownTimerRef.current = setTimeout(() => {
-            setCooldown(false);
-          }, cooldownDuration);
+          startCooldown();
         }
       );
     } else {
       alert("Geolocation is not supported by your browser.");
     }
+  };
+
+  const startCooldown = () => {
+    setCooldown(true);
+    cooldownTimerRef.current = setTimeout(() => {
+      setCooldown(false);
+      setIsCooldownOver(true);
+    }, cooldownDuration);
   };
 
   useEffect(() => {
@@ -111,6 +114,16 @@ const TriggerButton = ({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (isCooldownOver) {
+      // Reset the pulse animation flag after the animation ends (0.5s)
+      const timer = setTimeout(() => {
+        setIsCooldownOver(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isCooldownOver]);
 
   return (
     <div className="col-span-2 pointer-events-auto transform -translate-y-3 mx-2 flex justify-center">
@@ -125,41 +138,36 @@ const TriggerButton = ({
             {/* Gray background during cooldown, black otherwise */}
             <div
               className={`absolute inset-0 rounded-full ${
-                cooldown ? "bg-gray-300" : "bg-stone-900"
+                cooldown ? "bg-gray-500" : "bg-stone-900"
               }`}
             ></div>
 
             {/* Sliding Black Overlay */}
             {cooldown && (
               <div
-                className="absolute inset-0 rounded-full bg-stone-900"
-                style={{
-                  transform: "translateX(-100%)",
-                  animation: `slide-in ${cooldownDuration}ms linear forwards`,
-                }}
+                className="absolute inset-0 rounded-full bg-stone-900 animate-slide-in"
+                style={
+                  {
+                    transform: "translateX(-100%)",
+                    "--cooldown-duration": `${cooldownDuration}ms`,
+                  } as React.CSSProperties
+                }
               ></div>
             )}
 
             {/* Icon */}
             <SlLocationPin
               className={`relative text-4xl text-stone-100 ${
-                loading ? "animate-spin-with-delay" : ""
+                loading
+                  ? "animate-spin-with-delay"
+                  : isCooldownOver
+                  ? "animate-pulse-once"
+                  : ""
               }`}
             />
           </div>
         </div>
       </button>
-      {/* Add the keyframes animation in your CSS */}
-      <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(-100%);
-          }
-          to {
-            transform: translateX(0%);
-          }
-        }
-      `}</style>
     </div>
   );
 };
