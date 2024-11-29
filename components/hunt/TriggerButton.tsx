@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { SlLocationPin } from "react-icons/sl";
 import { runConfetti } from "../../lib/confetti";
 
@@ -12,6 +13,12 @@ const TriggerButton = ({
   setLoading,
   setShowSlammingX,
 }: TriggerButtonProps) => {
+  // Define the cooldown duration in milliseconds
+  const cooldownDuration = 10000; // Adjust this value to change the cooldown length
+
+  const [cooldown, setCooldown] = useState(false);
+  const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleClick = async () => {
     if ("geolocation" in navigator) {
       setLoading(true);
@@ -56,6 +63,11 @@ const TriggerButton = ({
             alert("An error occurred while checking your location.");
           } finally {
             setLoading(false);
+            // Start the cooldown after the loading is finished
+            setCooldown(true);
+            cooldownTimerRef.current = setTimeout(() => {
+              setCooldown(false);
+            }, cooldownDuration);
           }
         },
         (error) => {
@@ -79,6 +91,11 @@ const TriggerButton = ({
               alert("An unknown error occurred.");
               console.error("An unknown geolocation error occurred.");
           }
+          // Start the cooldown even if there's an error
+          setCooldown(true);
+          cooldownTimerRef.current = setTimeout(() => {
+            setCooldown(false);
+          }, cooldownDuration);
         }
       );
     } else {
@@ -86,23 +103,63 @@ const TriggerButton = ({
     }
   };
 
+  useEffect(() => {
+    // Cleanup the cooldown timer when the component unmounts
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearTimeout(cooldownTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="col-span-2 pointer-events-auto transform -translate-y-3 mx-2 flex justify-center">
       <button
-        onClick={loading ? undefined : handleClick}
+        onClick={loading || cooldown ? undefined : handleClick}
         className="pointer-events-auto"
-        disabled={loading}
+        disabled={loading || cooldown}
       >
-        <div className="bg-stone-700 rounded-full h-18 w-18 p-0.5">
-          <div className="bg-stone-900 rounded-full h-18 w-18 p-4 flex justify-center">
+        <div className="relative bg-gray-500 rounded-full h-18 w-18 p-0.5 overflow-hidden">
+          {/* Icon and Background */}
+          <div className="relative rounded-full h-full w-full p-4 flex justify-center items-center overflow-hidden">
+            {/* Gray background during cooldown, black otherwise */}
+            <div
+              className={`absolute inset-0 rounded-full ${
+                cooldown ? "bg-gray-300" : "bg-stone-900"
+              }`}
+            ></div>
+
+            {/* Sliding Black Overlay */}
+            {cooldown && (
+              <div
+                className="absolute inset-0 rounded-full bg-stone-900"
+                style={{
+                  transform: "translateX(-100%)",
+                  animation: `slide-in ${cooldownDuration}ms linear forwards`,
+                }}
+              ></div>
+            )}
+
+            {/* Icon */}
             <SlLocationPin
-              className={`text-4xl text-stone-100 ${
+              className={`relative text-4xl text-stone-100 ${
                 loading ? "animate-spin-with-delay" : ""
               }`}
             />
           </div>
         </div>
       </button>
+      {/* Add the keyframes animation in your CSS */}
+      <style jsx>{`
+        @keyframes slide-in {
+          from {
+            transform: translateX(-100%);
+          }
+          to {
+            transform: translateX(0%);
+          }
+        }
+      `}</style>
     </div>
   );
 };
