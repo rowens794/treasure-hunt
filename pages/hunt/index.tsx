@@ -44,6 +44,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       `${process.env.NEXTAUTH_URL}/api/hunt-status`,
       {
         method: "GET",
+        Accept: "application/json",
         headers: {
           cookie: context.req.headers.cookie || "", // Forward cookies
         },
