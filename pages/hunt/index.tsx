@@ -1,6 +1,8 @@
 import Controls from "@/components/hunt/Controls";
 import Video from "@/components/hunt/Video";
 import { GetServerSidePropsContext } from "next";
+import { getSession } from "next-auth/react";
+import { getClue } from "@/utils/getClue"; // Adjust the import path as needed
 
 interface Props {
   apiData: {
@@ -41,18 +43,9 @@ export default Hunt;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   try {
-    const start = Date.now();
-    // Make a call to your API route
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/hunt-status`, {
-      headers: {
-        cookie: context.req.headers.cookie || "",
-      },
-    });
+    const session = await getSession(context);
 
-    const apiData = await res.json();
-
-    // Redirect if the user is not authenticated
-    if (!apiData.currentClue._id) {
+    if (!session || !session.user) {
       console.log("User is not authenticated, redirecting...");
       return {
         redirect: {
@@ -62,18 +55,32 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       };
     }
 
-    console.log("Server-side rendering took", Date.now() - start, "ms");
+    const clue = await getClue(session);
+
+    if (!clue) {
+      console.log("No clue found, redirecting...");
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      };
+    }
 
     return {
       props: {
-        apiData,
+        apiData: {
+          authenticated: true,
+          currentClue: clue,
+        },
       },
     };
   } catch (error) {
     console.error("Error fetching API data:", error);
     return {
       props: {
-        apiData: { error: "Failed to fetch data" },
+        apiData: null,
+        error: error,
       },
     };
   }
