@@ -41,19 +41,28 @@ export default Hunt;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   try {
-    const start = Date.now();
-    // Make a call to your API route
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/hunt-status`, {
+    const { req } = context;
+    const protocol = req.headers["x-forwarded-proto"] || "http";
+    const host = req.headers.host;
+    const apiUrl = `${protocol}://${host}/api/hunt-status`;
+
+    const res = await fetch(apiUrl, {
       headers: {
-        cookie: context.req.headers.cookie || "", // Forward cookies for session handling
+        cookie: req.headers.cookie || "",
       },
     });
 
+    if (!res.ok) {
+      console.error(`API responded with status ${res.status}`);
+      throw new Error(`API responded with status ${res.status}`);
+    }
+
     const apiData = await res.json();
 
-    // Redirect if the user is not authenticated
-    if (!apiData.currentClue._id) {
-      console.log("User is not authenticated, redirecting...");
+    if (!apiData.currentClue?._id) {
+      console.log(
+        "User is not authenticated or currentClue is missing, redirecting..."
+      );
       return {
         redirect: {
           destination: "/",
@@ -62,18 +71,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       };
     }
 
-    console.log("Server-side rendering took", Date.now() - start, "ms");
-
     return {
       props: {
         apiData,
       },
     };
   } catch (error) {
-    console.error("Error fetching API data:", error);
     return {
       props: {
-        apiData: { error: "Failed to fetch data" },
+        apiData: null,
+        error: error,
       },
     };
   }
