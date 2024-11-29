@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
-import { Session } from "next-auth"; // Import prebuilt Session type
+import { Session } from "next-auth";
 
 interface Props {
   user: Session | null;
@@ -9,6 +9,7 @@ interface Props {
 
 const Menu = ({ user }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [urlPath, setUrlPath] = useState("");
 
   useEffect(() => {
     if (menuOpen) {
@@ -22,6 +23,10 @@ const Menu = ({ user }: Props) => {
       document.body.classList.remove("overflow-hidden");
     };
   }, [menuOpen]);
+
+  useEffect(() => {
+    setUrlPath(window.location.pathname);
+  }, []);
 
   return (
     <div className="z-[99] w-full fixed max-w-md top-2 flex justify-end">
@@ -65,16 +70,48 @@ const Menu = ({ user }: Props) => {
 
           {/* Menu Links */}
           <div className="pt-24 px-8 flex flex-col z-[99]">
-            <MenuItem text="Front Page" href="/" />
-            <MenuItem text="Community" href="/community" />
-            <MenuItem text="Business" href="/business" />
-            <MenuItem text="Opinion" href="/opinion" />
-            {user && <MenuItem text="The Hunt" href="/hunt" />}
+            <MenuItem
+              text="Front Page"
+              href="/"
+              urlPath={urlPath}
+              setMenuOpen={setMenuOpen}
+            />
+            <MenuItem
+              text="Community"
+              href="/community"
+              urlPath={urlPath}
+              setMenuOpen={setMenuOpen}
+            />
+            <MenuItem
+              text="Business"
+              href="/business"
+              urlPath={urlPath}
+              setMenuOpen={setMenuOpen}
+            />
+            <MenuItem
+              text="Opinion"
+              href="/opinion"
+              urlPath={urlPath}
+              setMenuOpen={setMenuOpen}
+            />
+            {user && (
+              <MenuItem
+                text="The Hunt"
+                href="/hunt"
+                urlPath={urlPath}
+                setMenuOpen={setMenuOpen}
+              />
+            )}
 
             <div className="mt-12 flex flex-col">
               {user ? (
                 <>
-                  <MenuItem text="Messages" href="/messages" />
+                  <MenuItem
+                    text="Messages"
+                    href="/messages"
+                    urlPath={urlPath}
+                    setMenuOpen={setMenuOpen}
+                  />
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     className="text-4xl text-stone-100 pb-2 cursor-pointer text-left"
@@ -84,8 +121,12 @@ const Menu = ({ user }: Props) => {
                 </>
               ) : (
                 <>
-                  <MenuItem text="Sign In" href="/login" />
-                  <MenuItem text="Register" href="/signup" />
+                  <MenuItem
+                    text="Sign In"
+                    href="/login"
+                    urlPath={urlPath}
+                    setMenuOpen={setMenuOpen}
+                  />
                 </>
               )}
             </div>
@@ -96,11 +137,35 @@ const Menu = ({ user }: Props) => {
   );
 };
 
-const MenuItem = ({ text, href }: { text: string; href: string }) => {
+const MenuItem = ({
+  text,
+  href,
+  urlPath,
+  setMenuOpen,
+}: {
+  text: string;
+  href: string;
+  urlPath: string;
+  setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   return (
-    <Link href={href} className="text-4xl text-stone-100 pb-2 cursor-pointer">
-      {text}
-    </Link>
+    <>
+      {urlPath === href ? (
+        <button
+          className="text-4xl text-stone-100 pb-2 cursor-pointer text-left"
+          onClick={() => setMenuOpen(false)}
+        >
+          {text}
+        </button>
+      ) : (
+        <Link
+          href={href}
+          className="text-4xl text-stone-100 pb-2 cursor-pointer"
+        >
+          {text}
+        </Link>
+      )}
+    </>
   );
 };
 
