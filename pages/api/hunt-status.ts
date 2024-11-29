@@ -48,7 +48,7 @@ async function getClue(session: Session | null): Promise<Clue> {
 
     const data = await response.json();
 
-    return data.currentClue;
+    return data.huntStatus.currentClueData;
   } catch (error) {
     console.error("Error getting hunt status:", error);
     throw new Error("Error getting hunt status");

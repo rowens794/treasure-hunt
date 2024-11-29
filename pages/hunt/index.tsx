@@ -1,5 +1,6 @@
 import Controls from "@/components/hunt/Controls";
 import Video from "@/components/hunt/Video";
+import { GetServerSidePropsContext } from "next";
 
 interface Props {
   apiData: {
@@ -23,10 +24,13 @@ interface Props {
 function Hunt({ apiData }: Props) {
   return (
     <div className="h-dvh w-full relative overflow-y-hidden">
-      <Video
-        videoPosterUrl={apiData.currentClue.videoPosterUrl}
-        videoUrl={apiData.currentClue.videoUrl}
-      />
+      {apiData ? (
+        <Video
+          videoPosterUrl={apiData.currentClue.videoPosterUrl}
+          videoUrl={apiData.currentClue.videoUrl}
+        />
+      ) : null}
+
       <Controls />
     </div>
   );
@@ -34,11 +38,9 @@ function Hunt({ apiData }: Props) {
 
 export default Hunt;
 
-// Fetch data server-side
-import { GetServerSidePropsContext } from "next";
-
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   try {
+    const start = Date.now();
     // Make a call to your API route
     const res = await fetch(`${process.env.NEXTAUTH_URL}/api/hunt-status`, {
       headers: {
@@ -58,6 +60,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         },
       };
     }
+
+    console.log("Server-side rendering took", Date.now() - start, "ms");
 
     return {
       props: {
