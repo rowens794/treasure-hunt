@@ -1,8 +1,6 @@
 import Controls from "@/components/hunt/Controls";
 import Video from "@/components/hunt/Video";
 import { GetServerSidePropsContext } from "next";
-import { getSession } from "next-auth/react";
-import { getClue } from "@/utils/getClue"; // Adjust the import path as needed
 
 interface Props {
   apiData: {
@@ -24,7 +22,6 @@ interface Props {
 }
 
 function Hunt({ apiData }: Props) {
-  console.log(apiData);
   return (
     <div className="h-dvh w-full relative overflow-y-hidden">
       {apiData && apiData.currentClue ? (
@@ -43,35 +40,23 @@ export default Hunt;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   try {
-    const session = await getSession(context);
-
-    if (!session || !session.user) {
-      console.log("User is not authenticated, redirecting...");
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
+    const response = await fetch(
+      `${process.env.NEXTAUTH_URL}/api/hunt-status`,
+      {
+        method: "GET",
+        headers: {
+          cookie: context.req.headers.cookie || "", // Forward cookies
         },
-      };
-    }
+      }
+    );
 
-    const clue = await getClue(session);
-
-    if (!clue) {
-      console.log("No clue found, redirecting...");
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
-    }
+    const data = await response.json();
 
     return {
       props: {
         apiData: {
           authenticated: true,
-          currentClue: clue,
+          currentClue: data.currentClue,
         },
       },
     };

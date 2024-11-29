@@ -35,13 +35,6 @@ async function getClue(session: Session | null): Promise<Clue> {
   const user = session ? session.user : {};
 
   try {
-    // Log the request details
-    console.log("Making request to:", `${process.env.PROXY_URL}/hunt-status`);
-    console.log("Request body:", {
-      ...user,
-      secret: process.env.PROXY_SECRET,
-    });
-
     const response = await fetch(`${process.env.PROXY_URL}/hunt-status`, {
       method: "POST",
       headers: {
@@ -53,13 +46,8 @@ async function getClue(session: Session | null): Promise<Clue> {
       }),
     });
 
-    // Log response status and headers
-    console.log("Response status:", response.status);
-    console.log("Response headers:", Object.fromEntries(response.headers));
-
     // Read the response text for better error messages
     const responseText = await response.text();
-    console.log("Response text:", responseText);
 
     if (!response.ok) {
       throw new Error(`External API responded with status ${response.status}`);
