@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from "next-auth/react";
+// import { getSession } from "next-auth/react";
 import { Clue } from "@/interfaces/Hunt";
-import { Session } from "next-auth";
+// import { Session } from "next-auth";
 
 interface ApiResponse {
-  currentClue?: Clue;
+  currentClue?: Clue | null;
   authenticated?: boolean;
 }
 
