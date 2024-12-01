@@ -11,6 +11,13 @@ interface HuntStatus {
   clueProgress: Date[];
 }
 
+interface Leader {
+  rank: number;
+  name: string;
+  currentClue: number;
+  lastSolved: string;
+}
+
 interface Clue {
   _id?: string;
   clueId: number;
@@ -42,4 +49,4 @@ interface Coordinates {
   longitude: number;
 }
 
-export type { HuntStatus, Clue, Coordinates, LocationCheck };
+export type { HuntStatus, Clue, Coordinates, LocationCheck, Leader };
