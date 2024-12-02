@@ -106,12 +106,6 @@ const Menu = ({ user }: Props) => {
             <div className="mt-12 flex flex-col">
               {user ? (
                 <>
-                  <MenuItem
-                    text="Messages"
-                    href="/messages"
-                    urlPath={urlPath}
-                    setMenuOpen={setMenuOpen}
-                  />
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     className="text-4xl text-stone-100 pb-2 cursor-pointer text-left"

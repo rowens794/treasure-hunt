@@ -49,4 +49,14 @@ interface Coordinates {
   longitude: number;
 }
 
-export type { HuntStatus, Clue, Coordinates, LocationCheck, Leader };
+interface Message {
+  messageId: string;
+  subject: string;
+  message: string;
+  timestamp: Date;
+  messageRead: boolean;
+  from: string;
+  read: boolean;
+}
+
+export type { HuntStatus, Clue, Coordinates, LocationCheck, Leader, Message };

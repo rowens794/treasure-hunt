@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { SlLocationPin } from "react-icons/sl";
 import { runConfetti } from "../../lib/confetti";
 
@@ -6,12 +7,14 @@ interface TriggerButtonProps {
   loading: boolean;
   setLoading: (loading: boolean) => void;
   setShowSlammingX: (value: boolean) => void;
+  currentPath: string;
 }
 
 const TriggerButton = ({
   loading,
   setLoading,
   setShowSlammingX,
+  currentPath,
 }: TriggerButtonProps) => {
   // Define the cooldown duration in milliseconds
   const cooldownDuration = 10000; // Adjust this value to change the cooldown length
@@ -127,47 +130,61 @@ const TriggerButton = ({
 
   return (
     <div className="col-span-2 pointer-events-auto transform -translate-y-3 mx-2 flex justify-center">
-      <button
-        onClick={loading || cooldown ? undefined : handleClick}
-        className="pointer-events-auto"
-        disabled={loading || cooldown}
-      >
-        <div className="relative bg-gray-500 rounded-full h-18 w-18 p-0.5 overflow-hidden">
-          {/* Icon and Background */}
-          <div className="relative rounded-full h-full w-full p-4 flex justify-center items-center overflow-hidden">
-            {/* Gray background during cooldown, black otherwise */}
-            <div
-              className={`absolute inset-0 rounded-full ${
-                cooldown ? "bg-gray-500" : "bg-stone-900"
-              }`}
-            ></div>
-
-            {/* Sliding Black Overlay */}
-            {cooldown && (
+      {currentPath === "/hunt" ? (
+        <button
+          onClick={loading || cooldown ? undefined : handleClick}
+          className="pointer-events-auto"
+          disabled={loading || cooldown}
+        >
+          <div className="relative bg-gray-500 rounded-full h-18 w-18 p-0.5 overflow-hidden">
+            {/* Icon and Background */}
+            <div className="relative rounded-full h-full w-full p-4 flex justify-center items-center overflow-hidden">
+              {/* Gray background during cooldown, black otherwise */}
               <div
-                className="absolute inset-0 rounded-full bg-stone-900 animate-slide-in"
-                style={
-                  {
-                    transform: "translateX(-100%)",
-                    "--cooldown-duration": `${cooldownDuration}ms`,
-                  } as React.CSSProperties
-                }
+                className={`absolute inset-0 rounded-full ${
+                  cooldown ? "bg-gray-500" : "bg-stone-900"
+                }`}
               ></div>
-            )}
 
-            {/* Icon */}
-            <SlLocationPin
-              className={`relative text-4xl text-stone-100 ${
-                loading
-                  ? "animate-spin-with-delay"
-                  : isCooldownOver
-                  ? "animate-pulse-once"
-                  : ""
-              }`}
-            />
+              {/* Sliding Black Overlay */}
+              {cooldown && (
+                <div
+                  className="absolute inset-0 rounded-full bg-stone-900 animate-slide-in"
+                  style={
+                    {
+                      transform: "translateX(-100%)",
+                      "--cooldown-duration": `${cooldownDuration}ms`,
+                    } as React.CSSProperties
+                  }
+                ></div>
+              )}
+
+              {/* Icon */}
+              <SlLocationPin
+                className={`relative text-4xl text-stone-100 ${
+                  loading
+                    ? "animate-spin-with-delay"
+                    : isCooldownOver
+                    ? "animate-pulse-once"
+                    : ""
+                }`}
+              />
+            </div>
           </div>
-        </div>
-      </button>
+        </button>
+      ) : (
+        <Link href="/hunt">
+          <button className="pointer-events-auto">
+            <div className="relative bg-gray-800 rounded-full h-18 w-18 p-0.5 overflow-hidden">
+              <div className="relative rounded-full h-full w-full p-4 flex justify-center items-center overflow-hidden">
+                <SlLocationPin
+                  className={`relative text-4xl text-stone-100 `}
+                />
+              </div>
+            </div>
+          </button>
+        </Link>
+      )}
     </div>
   );
 };
