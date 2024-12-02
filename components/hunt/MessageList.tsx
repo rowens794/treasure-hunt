@@ -40,7 +40,6 @@ export default function MessageList({ messages }: Props) {
 
         // Update the local state with the updated messages list
         const updatedMessages = await res.json();
-        console.log(updatedMessages);
         setMessageList(updatedMessages.messages);
       }
     } catch (error) {
@@ -109,7 +108,7 @@ const OpenMessage = ({
   return (
     <>
       {message && (
-        <div className="absolute top-0 left-0 w-screen h-screen z-[90] py-16 px-8">
+        <div className="absolute top-0 left-0 w-screen h-[80dvh] z-[90] py-16 px-8">
           <div className="w-full h-full bg-stone-200 relative opacity-95 border-stone-500 border rounded-sm px-4 py-16">
             <HiXCircle
               onClick={handleClose}

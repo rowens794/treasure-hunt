@@ -4,7 +4,6 @@ import Controls from "@/components/hunt/Controls";
 export default function index() {
   return (
     <>
-      {" "}
       <Controls />
       <div className="p-8 space-y-6 pb-24">
         <span className="text-3xl girassol-regular">How To Play</span>
